@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script type=text/javascript>
+      function setIframeSrc(){
+        var degInput = document.getElementById("degInputForm").value;
+        document.getElementById("resultMsg").src = "/resultForm1?degInput=" + degInput
+      }
+      var interval1_handler
+      function setIframeReload(){
+        var isRealTime = document.getElementById("real-time").checked;
+        if (isRealTime){
+          if (interval1_handler == null) interval1_handler = setInterval(function(){ setIframeSrc()},1500);
+        }else{
+          clearInterval(interval1_handler);
+          interval1_handler = null
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Hello world from LuboJ!</h1>
+    <form method="get" action="resultForm1">
+      Degrees: <input id="degInputForm" name="degInput" />
+      <input name="submit" type="button" value="Calculate" onclick="setIframeSrc()"/>
+      <input id="real-time" type="checkbox" value="" onchange="setIframeReload()" />Real-time reloding
+    </form>
+    <hr />
+    <iframe id="resultMsg" src=""></iframe>
+    <br /><i>created by LuboJ :)</i>
+  </body>
+</html>
