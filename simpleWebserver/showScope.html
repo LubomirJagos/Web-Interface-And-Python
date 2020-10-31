@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script type=text/javascript>
+      function setIframeSrc(){
+        var cacheParamValue = (new Date()).getTime();
+        document.getElementById("resultMsg").src = "/static/captured_image.png" + "?cache=" + cacheParamValue;
+        iframeElement = document.getElementById("resultMsg");
+        iframeElement.contentWindows.location.href = iframeElement.src;
+      }
+      function updateScope(){
+        var timeToRead = document.getElementById("timeToRead").value;
+        var sampleRate = document.getElementById("sampleRate").value;
+        document.getElementById("resultMsg2").src = "/oscilloscope?timeToRead=" + timeToRead + "&sampleRate=" + sampleRate;
+      }
+
+      var interval1_handler
+      function setIframeReload(){
+        var isRealTime = document.getElementById("real-time").checked;
+        if (isRealTime){
+          if (interval1_handler == null) interval1_handler = setInterval(function(){ setIframeSrc()},1500);
+        }else{
+          clearInterval(interval1_handler);
+          interval1_handler = null
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Oscilloscope data by LuboJ!</h1>
+    <form method="get" action="resultForm1">
+      <input name="submit" type="button" value="Calculate" onclick="setIframeSrc()"/>
+      <input id="real-time" type="checkbox" value="" onchange="setIframeReload()" checked/>Real-time reloding
+    </form>
+    <form>
+      timeToRead (s): <input type="text" id="timeToRead" value ="0.42" />
+      sampleRate (kS): <input type="text" id="sampleRate" value ="20" disabled />
+      <input type="button" id="update" onclick="updateScope()" value="Update Scope"/>
+    </form>
+    <hr />
+    <iframe style="width: 640px; height: 480px;" id="resultMsg" src=""></iframe>
+    <iframe style="width: 480px; height: 480px;" id="resultMsg2"></iframe>
+    <br /><i>created by LuboJ :)</i>
+  </body>
+  <script type="text/javascript">
+      setIframeReload();
+  </script>
+</html>
