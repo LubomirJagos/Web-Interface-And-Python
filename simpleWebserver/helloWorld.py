@@ -7,8 +7,15 @@ import matplotlib.pyplot as plt
 import csv
 import sys
 
-from flask import Flask, request
+import time
+import datetime
+from shutil import copyfile
+import shutil
 
+#from oct2py import octave
+#octave.addpath('/home/lubo/Documents/Otcave')
+
+from flask import Flask, request
 
 currDir = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,7 +36,7 @@ def deg2rad():
 	returnMsg = "User input degrees to radians: " + str(np.deg2rad(int(data)))
 	#returnMsg += "<br /><a href='/'>&lt;Back</a>"
 	return returnMsg
-	
+
 @app.route('/showScope')
 def showScope():
 	f = open(os.path.dirname(os.path.abspath(__file__)) + "/showScope.html")
@@ -48,7 +55,7 @@ def readHantek6022():
 	scopeData = subprocess.check_output(['capture_6022.py','-t '+str(timeToRead)])	
 
 	f = open("captured_data.csv", "w")
-	f.write(str(scopeData, 'utf-8'))
+	f.write(str(scopeData, 'utf-8'))	# <----- CONVERT b' BYTES STREAM INTO STRING FROM SUBPROCESS!
 	f.close()
 
 	x = []
@@ -67,7 +74,46 @@ def readHantek6022():
 	
 	return scopeData
 	
+@app.route('/octave-deg-2-rad')
+def octaveDeg2Rad():
+	headerResult = ""
+	#headerResult += "Time (ms): " + str(int(round(time.time())))
+	headerResult += "Time (ms): " + str(int(round(time.time_ns()//1000000)))
 
+	filePath = '/tmp/_python_octave'
+	if not os.path.isdir(filePath):
+		os.mkdir(filePath)
+
+	#remove file if it were there previosly copied
+	filePath = '/tmp/_python_octave/deg2rad.m'
+	if os.path.exists(filePath):
+		os.remove(filePath)
+
+	#remove file if there were already copied before
+	filePath = '/tmp/_python_octave/deg2rad.sh'
+	if os.path.exists(filePath):
+		os.remove(filePath)
+
+	# function shutil.copyfile is not copying metadata
+	#THIS IS RIGHT ALEO COPYING PERMISSIONS TO BE RUNNABLE
+	#    copying files to /tmp/_python_octave dir to be executable python.flask
+	#    process user (do this to be sure files are in dir where they will be runnable)
+	shutil.copy2(currDir+'/deg2rad.m', '/tmp/_python_octave/deg2rad.m')
+	shutil.copy2(currDir+'/deg2rad.m', '/tmp/_python_octave/deg2rad.sh')
+
+	#octaveResult = subprocess.check_output([currDir+'/deg2rad.sh'])
+	octaveResult = subprocess.check_output(['/tmp/_python_octave/deg2rad.sh'])
+	#octaveResult = subprocess.check_output(['bash','-c','octave-cli','/tmp/deg2rad.m'])
+
+	footerResult = ""
+	footerResult += "Time (ms): " + str(int(round(time.time_ns()//1000000)))
+
+	outputStr =  headerResult
+	outputStr += "<br />"
+	outputStr += str(octaveResult, 'utf-8')
+	outputStr += "<br />"
+	outputStr += footerResult
+	return outputStr
 
 
 if __name__ == '__main__':
