@@ -115,6 +115,18 @@ def octaveDeg2Rad():
 	outputStr += footerResult
 	return outputStr
 
+@app.route('/makeCamera')
+def makecamera():
+	filePath = '/tmp/camera'
+	if not os.path.isdir(filePath):
+		os.mkdir(filePath)
+	result = subprocess.check_output(['fswebcam',currDir+'/static/CameraCurrPic.jpg'])
+	return 'camera image captured'
+
+@app.route('/showCamera')
+def showCamera():
+	indexFile = open(currDir + "/showCamera.html")
+	return indexFile.read()
 
 if __name__ == '__main__':
 	app.run(debug=True, port=80, host='0.0.0.0')
