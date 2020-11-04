@@ -128,6 +128,27 @@ def showCamera():
 	indexFile = open(currDir + "/showCamera.html")
 	return indexFile.read()
 
+@app.route('/showConvolution', methods=['GET'])
+def showConvolution():
+#	return "<i>Fuck</i>"
+	indexFile = open(currDir + "/showConvolution.html")
+	return indexFile.read()
+
+@app.route('/getRrr', methods=['GET'])
+def getRandomConvolutionResult():
+	result = "<h1>God Message to You Mortal one!</h1><br>\n"
+	result += "You piecie of shit, there's no even tags lwft for you...\n"
+	
+
+	result += "<pre>\n"
+	result += "Last Words for you: "+str(np.convolve([1,2,1],[42,0,42]))
+	result += "\n"
+	result += "</pre>\n"
+	return result
+
+#
+# RUNNING PROGRAMME!
+#
 if __name__ == '__main__':
 	app.run(debug=True, port=80, host='0.0.0.0')
 
